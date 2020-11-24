@@ -14,7 +14,7 @@ import java.util.List;
 public class Exposition {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue
 	private long id;
 
 	private String title;
