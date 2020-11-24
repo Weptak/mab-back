@@ -2,6 +2,7 @@ package be.bruxellesformation.mabback.domain;
 
 import be.bruxellesformation.mabback.exceptions.IsExposedException;
 import be.bruxellesformation.mabback.exceptions.NotInExpositionException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,8 +33,10 @@ public class Artefact {
 	private int startYear;
 	private int endYear;
 	@ManyToOne
+	@JsonIgnore
 	private Culture culture;
 	@ManyToOne
+	@JsonIgnore
 	private Exposition exposition;
 
 	/* ----------------
