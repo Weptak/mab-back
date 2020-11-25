@@ -25,7 +25,7 @@ public class ExpositionRestController {
 
     /**
      * Responds to a GET request on "/expo" by returning all the Expositions
-     * @return a List of Exposition
+     * @return a List of Exposition.
      */
     @GetMapping
     public List<Exposition> allExpositions(){

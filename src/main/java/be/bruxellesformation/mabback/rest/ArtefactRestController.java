@@ -65,6 +65,7 @@ public class ArtefactRestController {
      * @return a ResponseEntity containing the created artefact and a CREATED status. If the Artefact identification
      * was already in the database a NOT_ACCEPTABLE status is returned.
      */
+
     @PostMapping
     public ResponseEntity<Artefact> create(@RequestBody Artefact artefact){
         if (!repository.existsById(artefact.getIdentification())) {

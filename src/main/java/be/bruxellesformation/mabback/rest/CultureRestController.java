@@ -1,6 +1,8 @@
 package be.bruxellesformation.mabback.rest;
 
+import be.bruxellesformation.mabback.domain.Artefact;
 import be.bruxellesformation.mabback.domain.Culture;
+import be.bruxellesformation.mabback.repositories.IArtefactsRepository;
 import be.bruxellesformation.mabback.repositories.ICulturesRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +15,13 @@ import java.util.Optional;
 @RequestMapping("/culture")
 public class CultureRestController {
 
-    //Linked Repository
-    private ICulturesRepository repository;
+    //Linked Repositories
+    private ICulturesRepository culturesRepository;
+    private IArtefactsRepository artefactsRepository;
 
     // Constructor
-    public CultureRestController(ICulturesRepository repository) {
-        this.repository = repository;
+    public CultureRestController(ICulturesRepository culturesRepository) {
+        this.culturesRepository = culturesRepository;
     }
 
     // Rest Endpoints
@@ -29,7 +32,7 @@ public class CultureRestController {
      */
     @GetMapping
     public List<Culture> allCultures(){
-        return repository.findAll();
+        return culturesRepository.findAll();
     }
 
     /**
@@ -39,7 +42,7 @@ public class CultureRestController {
      */
     @GetMapping(path = "/{id}")
     public ResponseEntity<Culture> findById(@PathVariable("id") String id){
-        Optional<Culture> culture = repository.findById(Long.parseLong(id));
+        Optional<Culture> culture = culturesRepository.findById(Long.parseLong(id));
         return culture.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
@@ -56,7 +59,7 @@ public class CultureRestController {
         beginStart = endingStart = Integer.parseInt(startDate);
         int beginEnd, endingEnd ;
         beginEnd = endingEnd= Integer.parseInt(endDate);
-        return repository.findAllByStartYearBetweenOrEndYearBetween(beginStart,beginEnd,endingStart,endingEnd);
+        return culturesRepository.findAllByStartYearBetweenOrEndYearBetween(beginStart,beginEnd,endingStart,endingEnd);
     }
 
     /**
@@ -66,7 +69,7 @@ public class CultureRestController {
      */
     @GetMapping("/search")
     public List<Culture> findByName(@RequestParam String name){
-        return repository.findByNameIgnoreCaseContaining(name);
+        return culturesRepository.findByNameIgnoreCaseContaining(name);
     }
 
     /**
@@ -77,8 +80,8 @@ public class CultureRestController {
      */
     @PostMapping
     public ResponseEntity<Culture> create(@RequestBody Culture culture){
-        if (!repository.existsById(culture.getId())) {
-            repository.save(culture);
+        if (!culturesRepository.existsById(culture.getId())) {
+            culturesRepository.save(culture);
             return new ResponseEntity<>(culture, HttpStatus.CREATED);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -93,7 +96,7 @@ public class CultureRestController {
     @PutMapping
     public ResponseEntity<Culture> update(@RequestBody Culture culture){
         try {
-            repository.save(culture);
+            culturesRepository.save(culture);
             return new ResponseEntity<>(culture,HttpStatus.ACCEPTED);
         } catch (Exception exception){
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -109,9 +112,9 @@ public class CultureRestController {
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Culture> deleteById(@PathVariable String id){
         Long idLong = Long.parseLong(id);
-        Optional<Culture> culture = repository.findById(idLong);
+        Optional<Culture> culture = culturesRepository.findById(idLong);
         if (culture.isPresent()) {
-            repository.deleteById(idLong);
+            culturesRepository.deleteById(idLong);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
