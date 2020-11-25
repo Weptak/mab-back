@@ -1,5 +1,9 @@
 package be.bruxellesformation.mabback.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,10 +15,13 @@ import java.util.List;
  *  @author : Yorick Weenen
  */
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Exposition {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private String title;
@@ -24,17 +31,14 @@ public class Exposition {
 	private LocalDate endDate;
 	private int visitorCount = 0;
 
-	@OneToMany
+	@OneToMany(mappedBy = "exposition")
 	private List<Artefact> exposedArtefacts;
 
 	/*
 	 * -------------
-	 * Constructors
+	 * Constructor
 	 * -------------
  	 */
-
-	public Exposition() {
-	}
 
 	/**
 	 * Create a new instance of the Exposition class.
@@ -49,60 +53,6 @@ public class Exposition {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.exposedArtefacts = new ArrayList<>();
-	}
-
-	/*
-	 * -------------
-	 * Getters & Setters
-	 * -------------
-	 */
-
-	public void setId(long id){
-		this.id=id;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public String getDescription() {
-		return Description;
-	}
-
-	public void setDescription(String description) {
-		Description = description;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public LocalDate getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
-	}
-
-	public LocalDate getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(LocalDate endDate) {
-		this.endDate = endDate;
-	}
-
-	public int getVisitorCount() {
-		return visitorCount;
-	}
-
-	public List<Artefact> getExposedArtefacts() {
-		return exposedArtefacts;
 	}
 
    /* -------------

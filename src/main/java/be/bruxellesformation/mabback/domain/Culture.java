@@ -1,6 +1,11 @@
 package be.bruxellesformation.mabback.domain;
 
 
+import com.fasterxml.jackson.annotation.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -11,9 +16,12 @@ import java.util.List;
  */
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Culture {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private String name;
@@ -23,17 +31,15 @@ public class Culture {
 	private String cultureMap;
 	private int startYear;
 	private int endYear;
-	@OneToMany
+	@OneToMany(mappedBy = "culture")
+	@JsonIgnoreProperties("culture")
 	private List<Artefact> artefacts;
 
 	/*
 	 * ----------------
-	 * Constructors
+	 * Constructor
 	 * ----------------
 	 */
-
-	public Culture() {
-	}
 
 	/** Creates a new instance of the Culture class.
 	 *
@@ -51,74 +57,5 @@ public class Culture {
 		this.cultureMap = cultureMap;
 		this.startYear = startYear;
 		this.endYear = endYear;
-	}
-
-	/*
-	 * ----------------
-	 * Getters & Setters
-	 * ----------------
-	 */
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getPeriodDescription() {
-		return periodDescription;
-	}
-
-	public void setPeriodDescription(String periodDescription) {
-		this.periodDescription = periodDescription;
-	}
-
-	public String getCultureMap() {
-		return cultureMap;
-	}
-
-	public void setCultureMap(String cultureMap) {
-		this.cultureMap = cultureMap;
-	}
-
-	public int getStartYear() {
-		return startYear;
-	}
-
-	public void setStartYear(int startYear) {
-		this.startYear = startYear;
-	}
-
-	public int getEndYear() {
-		return endYear;
-	}
-
-	public void setEndYear(int endYear) {
-		this.endYear = endYear;
-	}
-
-	public List<Artefact> getArtefacts() {
-		return artefacts;
-	}
-
-	public void setArtefacts(List<Artefact> artefacts) {
-		this.artefacts = artefacts;
 	}
 }

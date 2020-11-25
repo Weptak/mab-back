@@ -3,19 +3,21 @@ package be.bruxellesformation.mabback.domain;
 import be.bruxellesformation.mabback.exceptions.IsExposedException;
 import be.bruxellesformation.mabback.exceptions.NotInExpositionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 /** Project : Musée Archéologique de Brüsel
  * File Name : Artefact.java
  * Date : 23-11-20
  * @author : Yorick Weenen
+ * The identification is the inventory identifier of the artefact
  */
 @Entity
+@NoArgsConstructor
 public class Artefact {
 
 	@Id
@@ -24,6 +26,7 @@ public class Artefact {
 	@Lob
 	private String objectDescription;
 	private String periodDescription;
+	private transient String cultureName;
 	private String culturalPhase;
 	private String type;
 	private String material;
@@ -35,14 +38,14 @@ public class Artefact {
 	private int startYear;
 	private int endYear;
 	@ManyToOne
-	@JsonIgnore
+	@JsonIgnoreProperties("artefacts")
 	private Culture culture;
 	@ManyToOne
 	@JsonIgnore
 	private Exposition exposition;
 
 	/* ----------------
-	 *  Constructors
+	 *  Constructor
 	 *  ----------------
 	 */
 
@@ -78,10 +81,7 @@ public class Artefact {
 		this.endYear = endYear;
 		this.culture = culture;
 		this.objectDescription = objectDescription;
-	}
-
-	public Artefact() {
-
+		this.cultureName=culture.getName();
 	}
 
 	/*
