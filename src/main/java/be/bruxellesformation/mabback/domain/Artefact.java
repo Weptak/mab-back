@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 
@@ -20,6 +21,7 @@ public class Artefact {
 	@Id
 	private String identification;
 	private String name;
+	@Lob
 	private String objectDescription;
 	private String periodDescription;
 	private String culturalPhase;

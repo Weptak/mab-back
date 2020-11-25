@@ -18,6 +18,7 @@ public class Exposition {
 	private long id;
 
 	private String title;
+	@Lob
 	private String Description;
 	private LocalDate startDate;
 	private LocalDate endDate;

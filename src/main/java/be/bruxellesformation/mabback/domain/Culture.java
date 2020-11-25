@@ -17,6 +17,7 @@ public class Culture {
 	private long id;
 
 	private String name;
+	@Lob
 	private String description;
 	private String periodDescription;
 	private String cultureMap;

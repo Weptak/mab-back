@@ -45,12 +45,12 @@ public class CultureRestController {
     }
 
     /**
-     * Responds to a GET request like "/culture?startDate=-150&endDate=200"
+     * Responds to a GET request like "/culture/dates?startDate=-150&endDate=200"
      * @param startDate the earliest date for the search
      * @param endDate the latest date for the search
      * @return a List of Culture containing all the results of the search
      */
-    @GetMapping
+    @GetMapping("/dates")
     public List<Culture> culturesBetweenDates(@RequestParam String startDate, @RequestParam String endDate){
         int beginStart, endingStart;
         beginStart = endingStart = Integer.parseInt(startDate);
@@ -60,12 +60,60 @@ public class CultureRestController {
     }
 
     /**
-     * Responds to a GET request like "/culture?name=Romain"
+     * Responds to a GET request like "/culture/search?name=Romain"
      * @param name the name or part of name to be searched in the culture names
      * @return a List of Culture corresponding to the search
      */
-    @GetMapping
+    @GetMapping("/search")
     public List<Culture> findByName(@RequestParam String name){
         return repository.findByNameIgnoreCaseContaining(name);
+    }
+
+    /**
+     * Responds to a POST request on "/culture". The request must contain a Culture in its body.
+     * @param culture the Culture entity to be added in the database
+     * @return a ResponseEntity containing the created culture and a CREATED status. If the Culture id
+     * was already in the database a NOT_ACCEPTABLE status is returned.
+     */
+    @PostMapping
+    public ResponseEntity<Culture> create(@RequestBody Culture culture){
+        if (!repository.existsById(culture.getId())) {
+            repository.save(culture);
+            return new ResponseEntity<>(culture, HttpStatus.CREATED);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    /**
+     * Responds to a PUT request on "/culture". The request must contain a Culture in its body.
+     * @param culture is the Culture object containing the values to update in the database.
+     * @return a ResponseEntity containing the Culture with updated values and an ACCEPTED status. If the update is
+     * unsuccessful, it will return a NOT_ACCEPTABLE status.
+     */
+    @PutMapping
+    public ResponseEntity<Culture> update(@RequestBody Culture culture){
+        try {
+            repository.save(culture);
+            return new ResponseEntity<>(culture,HttpStatus.ACCEPTED);
+        } catch (Exception exception){
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    /**
+     * Responds to a DELETE request on "/culture/{id}"
+     * @param id is the identification of the Culture to delete from the database
+     * @return a ResponseEntity with the ACCEPTED status if the Culture was in the database and was deleted. Otherwise,
+     * it returns a NOT_ACCEPTED status.
+     */
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Culture> deleteById(@PathVariable String id){
+        Long idLong = Long.parseLong(id);
+        Optional<Culture> culture = repository.findById(idLong);
+        if (culture.isPresent()) {
+            repository.deleteById(idLong);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 }

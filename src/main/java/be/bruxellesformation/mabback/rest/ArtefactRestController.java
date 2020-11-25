@@ -45,12 +45,12 @@ public class ArtefactRestController {
     }
 
     /**
-     * Responds to a GET request like "/collections?criteria=statue"
+     * Responds to a GET request like "/collections/search?criteria=statue"
      * @param criteria the searched value
      * @return a List of Artefacts where either the name, the cultural phase, the type or the material contains
      * the searched value
      */
-    @GetMapping
+    @GetMapping("/search")
     public List<Artefact> complexSearch(@RequestParam String criteria){
         String name, culturalPhase, type, material;
         name = culturalPhase = type = material = criteria;
