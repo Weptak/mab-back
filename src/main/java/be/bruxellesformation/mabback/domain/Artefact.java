@@ -96,7 +96,7 @@ public class Artefact {
 	 * @param roomId is a String representing the code of the room the object is to be displayed in.
 	 */
 	public void displayArtefactInRoom(String roomId) {
-		checkOnExpo();
+		checkNotOnExpo();
 		this.localisation = roomId;
 		onPermanentDisplay =true;
 	}
@@ -106,7 +106,7 @@ public class Artefact {
 	 * @param reserveLocation the location in reserve to store the object
 	 */
 	public void sendArtefactToReserves(String reserveLocation){
-		checkOnExpo();
+		checkNotOnExpo();
 		onPermanentDisplay = false;
 		this.localisation=reserveLocation;
 	}
@@ -117,7 +117,7 @@ public class Artefact {
 	 * @param exposition the title of the exposition is used to update the localisation of the object.
 	 */
 	public void displayArtefactInExposition(Exposition exposition) {
-		checkOnExpo();
+		checkNotOnExpo();
 		if (isOnPermanentDisplay())
 			onPermanentDisplay=false;
 		this.inExposition =true;
@@ -138,12 +138,17 @@ public class Artefact {
 			throw new NotInExpositionException("L'objet "+ this.identification +" n'est pas dans une exposition");
 	}
 
-	/** Check if the museum object is already in an exposition.
+	/** Check if the museum object is not in an exposition.
 	 * @throws IsExposedException is thrown if the object is in an exposition.
 	 */
-	private void checkOnExpo() {
+	public void checkNotOnExpo() {
 		if (inExposition)
 			throw new IsExposedException("L'objet "+ this.identification+" est actuellement en exposition");
+	}
+
+	public void changeLocalisation(String room){
+		// In a real case, would check the validity of the room.
+		this.localisation = room;
 	}
 
 }
