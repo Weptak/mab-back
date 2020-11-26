@@ -15,7 +15,8 @@ class ExpositionTest {
             "My Test Expo",
             "This is a test expo",
             LocalDate.now(),
-            LocalDate.of(2020,12, 25));
+            LocalDate.of(2020,12, 25),
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Ramses_II_at_Kadesh.jpg/260px-Ramses_II_at_Kadesh.jpg");
 
     Culture testCulture = new Culture("Ancienne Egypte", "Really old",
             "IIIe milléraire au Ier siècle ACN",
@@ -36,7 +37,7 @@ class ExpositionTest {
 
     @Test
     void addArtefactsToExposition() {
-        expositionTest.addArtefactsToExposition(testArtefact);
+        expositionTest.addArtefactToExposition(testArtefact);
         assertEquals(1, expositionTest.getExposedArtefacts().size());
         assertEquals("EG1000",expositionTest.getExposedArtefacts().get(0).getIdentification() );
         assertTrue(testArtefact.isInExposition());
