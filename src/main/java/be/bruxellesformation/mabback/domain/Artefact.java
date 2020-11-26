@@ -4,8 +4,9 @@ import be.bruxellesformation.mabback.exceptions.IsExposedException;
 import be.bruxellesformation.mabback.exceptions.NotInExpositionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ import java.time.LocalDate;
  * The identification is the inventory identifier of the artefact
  */
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 public class Artefact {
 
@@ -26,7 +29,6 @@ public class Artefact {
 	@Lob
 	private String objectDescription;
 	private String periodDescription;
-	private transient String cultureName;
 	private String culturalPhase;
 	private String type;
 	private String material;
@@ -49,7 +51,7 @@ public class Artefact {
 	 *  ----------------
 	 */
 
-	/** Creates a new museal object instance.
+	/** Creates a new museum object instance.
 	 *
 	 * @param identification is the museum's identifier for the object, has to be unique.
 	 * @param name is the name of the object, if it has one
@@ -61,7 +63,7 @@ public class Artefact {
 	 * @param periodDescription is the literary value of the date of the object, like "second half of 2nd century AD"
 	 * @param startYear the starting date of this object or object type date in Year, like "150"
 	 * @param endYear the ending date of this object or object type date in Year, like "199"
-	 * @param dateOfEntry when the museal object is added to the collection
+	 * @param dateOfEntry when the museum object is added to the collection
 	 * @param localisation the physical location of the object, can be a room identifier, an exposition name or a location in the reserves
 	 * @param imageURL the link to the picture of the object
 	 */
@@ -81,133 +83,6 @@ public class Artefact {
 		this.endYear = endYear;
 		this.culture = culture;
 		this.objectDescription = objectDescription;
-		this.cultureName=culture.getName();
-	}
-
-	/*
-	 * ----------------
-	 * Getters & Setters
-	 * ----------------
-	 */
-
-	public String getIdentification() {
-		return identification;
-	}
-
-	public void setIdentification(String identification) {
-		this.identification = identification;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getObjectDescription() {
-		return objectDescription;
-	}
-
-	public void setObjectDescription(String objectDescription) {
-		this.objectDescription = objectDescription;
-	}
-
-	public String getPeriodDescription() {
-		return periodDescription;
-	}
-
-	public void setPeriodDescription(String periodDescription) {
-		this.periodDescription = periodDescription;
-	}
-
-	public String getCulturalPhase() {
-		return culturalPhase;
-	}
-
-	public void setCulturalPhase(String culturalPhase) {
-		this.culturalPhase = culturalPhase;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getMaterial() {
-		return material;
-	}
-
-	public void setMaterial(String material) {
-		this.material = material;
-	}
-
-	public String getLocalisation() {
-		return localisation;
-	}
-
-	public void setLocalisation(String localisation) {
-		this.localisation = localisation;
-	}
-
-	public String getImageURL() {
-		return imageURL;
-	}
-
-	public void setImageURL(String imageURL) {
-		this.imageURL = imageURL;
-	}
-
-	public LocalDate getDateOfEntry() {
-		return dateOfEntry;
-	}
-
-	public void setDateOfEntry(LocalDate dateOfEntry) {
-		this.dateOfEntry = dateOfEntry;
-	}
-
-	public int getStartYear() {
-		return startYear;
-	}
-
-	public void setStartYear(int startYear) {
-		this.startYear = startYear;
-	}
-
-	public int getEndYear() {
-		return endYear;
-	}
-
-	public void setEndYear(int endYear) {
-		this.endYear = endYear;
-	}
-
-	public Culture getCulture() {
-		return culture;
-	}
-
-	public void setCulture(Culture culture) {
-		this.culture = culture;
-	}
-
-	public Exposition getExposition() {
-		return exposition;
-	}
-
-	public void setExposition(Exposition exposition) {
-		this.exposition = exposition;
-	}
-
-	public boolean isOnPermanentDisplay() {
-		return onPermanentDisplay;
-	}
-
-	public boolean isInExposition() {
-		return inExposition;
 	}
 
 	/* ----------------
@@ -250,7 +125,7 @@ public class Artefact {
 
 	/** The object is to be sent back to the museum's reserves.
 	 *  The method checks if the object is currently in an exposition.
-	 * @throws NotInExpositionException if the museal object is not in an exposition.
+	 * @throws NotInExpositionException if the museum object is not in an exposition.
 	 */
 	public void getOutOfExpo(){
 		if (inExposition) {
@@ -261,7 +136,7 @@ public class Artefact {
 			throw new NotInExpositionException("L'objet "+ this.identification +" n'est pas dans une exposition");
 	}
 
-	/** Check if the museal object is already in an exposition.
+	/** Check if the museum object is already in an exposition.
 	 * @throws IsExposedException is thrown if the object is in an exposition.
 	 */
 	private void checkOnExpo() {

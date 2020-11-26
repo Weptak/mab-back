@@ -69,7 +69,7 @@ public class Exposition {
 			visitorCount += numberOfVisitors;
 	}
 
-	/** Add museal objects to the exposition. If no objects are sent in parameter, the method does nothing.
+	/** Add museum objects to the exposition. If no objects are sent in parameter, the method does nothing.
 	 *
 	 * @param items is the museum objects to be added in the exposition.
 	 */
