@@ -12,4 +12,7 @@ public interface IArtefactsRepository extends JpaRepository<Artefact, String> {
             String name, String culturePhase, String type, String material);
 
     List<Artefact> findAllByCulture(Culture culture);
+
+    List<Artefact> findAllByStartYearBetweenOrEndYearBetween(
+            int startEarlyLimit, int startLateLimit, int endEarlyLimit, int endLateLimit);
 }

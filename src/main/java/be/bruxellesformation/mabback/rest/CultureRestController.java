@@ -1,8 +1,6 @@
 package be.bruxellesformation.mabback.rest;
 
-import be.bruxellesformation.mabback.domain.Artefact;
 import be.bruxellesformation.mabback.domain.Culture;
-import be.bruxellesformation.mabback.repositories.IArtefactsRepository;
 import be.bruxellesformation.mabback.repositories.ICulturesRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,6 @@ public class CultureRestController {
 
     //Linked Repositories
     private ICulturesRepository culturesRepository;
-    private IArtefactsRepository artefactsRepository;
 
     // Constructor
     public CultureRestController(ICulturesRepository culturesRepository) {
@@ -55,11 +52,14 @@ public class CultureRestController {
      */
     @GetMapping("/dates")
     public List<Culture> culturesBetweenDates(@RequestParam String startDate, @RequestParam String endDate){
-        int beginStart, endingStart;
-        beginStart = endingStart = Integer.parseInt(startDate);
-        int beginEnd, endingEnd ;
-        beginEnd = endingEnd= Integer.parseInt(endDate);
-        return culturesRepository.findAllByStartYearBetweenOrEndYearBetween(beginStart,beginEnd,endingStart,endingEnd);
+        int startEarlyLimit, endEarlyLimit;
+        startEarlyLimit = endEarlyLimit = Integer.parseInt(startDate);
+
+        int startLateLimit, endLateLimit ;
+        startLateLimit = endLateLimit= Integer.parseInt(endDate);
+
+        return culturesRepository.findAllByStartYearBetweenOrEndYearBetween(
+                startEarlyLimit,startLateLimit,endEarlyLimit,endLateLimit);
     }
 
     /**

@@ -2,11 +2,15 @@ package be.bruxellesformation.mabback.rest;
 
 import be.bruxellesformation.mabback.domain.Artefact;
 import be.bruxellesformation.mabback.repositories.IArtefactsRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -24,17 +28,18 @@ public class ArtefactRestController {
     // Rest Endpoints
 
     /**
-     * Responds to a GET request on "/collections"
-     * @return a List of all the Artefacts
+     * Responds to a GET request on "/collections". The body must contain a Map with the keys: pageNumber and itemsPerPage. The values should be numbers.
+     * @return a Page of all the Artefacts
      */
     @GetMapping
-    public List<Artefact> allArtefacts(){
-        return repository.findAll();
+    public Page<Artefact> allArtefacts(@RequestBody Map<String, Integer> pagingInfo){
+        Pageable pagination = PageRequest.of(pagingInfo.get("pageNumber"), pagingInfo.get("itemsPerPage"));
+        return repository.findAll(pagination);
     }
 
     /**
      * Responds to a GET request like "/collections/EG1000"
-     * @param id the identification of the Artefact
+     * @param id the identification of the Artefact in the path of the request
      * @return a ResponseEntity containing the Artefact, or NO_CONTENT if nothing is found
      */
     @GetMapping("/{id}")
@@ -42,6 +47,24 @@ public class ArtefactRestController {
         Optional<Artefact> artefact = repository.findById(id);
         return artefact.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
+    }
+
+    /**
+     * Responds to a GET request like "/collections/dates?startDate=-150&endDate=200"
+     * @param startDate the earliest date for the search
+     * @param endDate the latest date for the search
+     * @return a List of Artefact containing all the results of the search
+     */
+    @GetMapping("/dates")
+    public List<Artefact> artefactsBetweenDates(@RequestParam String startDate, @RequestParam String endDate){
+        int startEarlyLimit, endEarlyLimit;
+        startEarlyLimit = endEarlyLimit = Integer.parseInt(startDate);
+
+        int startLateLimit, endLateLimit ;
+        startLateLimit = endLateLimit= Integer.parseInt(endDate);
+
+        return repository.findAllByStartYearBetweenOrEndYearBetween(
+                startEarlyLimit,startLateLimit,endEarlyLimit,endLateLimit);
     }
 
     /**
@@ -105,5 +128,43 @@ public class ArtefactRestController {
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    /**
+     * Responds to a PATCH request on "/collections/{id}" followed by optional request parameters. Used to move an
+     * Artefact to a new room, to the reserves or remove it from an exposition to the reserves.
+     * @param id The ID of the Artefact that has to be moved.
+     * @param room The name of the room into which the artefact is to be moved.
+     *             If the value is "reserves", the artefact will be moved to the reserves by calling the
+     *             {@link Artefact#sendArtefactToReserves(String)} method.
+     *             If the value is "off expo", the artefact will be moved out of the exposition by calling the
+     *             {@link Artefact#getOutOfExpo()} method.
+     * @return A ResponseEntity with the updated Artefact and an OK status. A NOT_FOUND status will be returned if
+     * the ID is not found in the database.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Artefact> changeLocation(@PathVariable String id,
+                                                   @RequestParam(required = false) String room){
+
+        // Retrieve the Artefact
+        Artefact artefact;
+        Optional<Artefact> searchedArtefact = repository.findById(id);
+        if(!searchedArtefact.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else
+            artefact = searchedArtefact.get();
+
+        // Change the location depending on the parameters of the request
+        switch (room){
+            case "reserves" :
+                artefact.checkNotOnExpo();
+                artefact.sendArtefactToReserves("In Reserves");
+                break;
+            case "off expo" : artefact.getOutOfExpo(); break;
+            default: artefact.changeLocalisation(room);
+        }
+
+        repository.save(artefact);
+        return new ResponseEntity<>(artefact,HttpStatus.OK);
     }
 }

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ICulturesRepository extends JpaRepository<Culture, Long> {
 
-    List<Culture> findAllByStartYearBetweenOrEndYearBetween(int beginStart, int beginEnd, int endingStart, int endingEnd);
+    List<Culture> findAllByStartYearBetweenOrEndYearBetween(
+            int startEarlyLimit, int startLateLimit, int endEarlyLimit, int endLateLimit);
+
     List<Culture> findByNameIgnoreCaseContaining(String name);
 }
