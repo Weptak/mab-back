@@ -29,9 +29,10 @@ public class Exposition {
 	private String Description;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private String imageUrl;
 	private int visitorCount = 0;
 
-	@OneToMany(mappedBy = "exposition")
+	@OneToMany(mappedBy = "exposition", cascade = CascadeType.ALL)
 	private List<Artefact> exposedArtefacts;
 
 	/*
@@ -47,11 +48,12 @@ public class Exposition {
 	 * @param startDate the starting date of the exposition
 	 * @param endDate the date of the ending of the exposition
 	 */
-	public Exposition(String title, String description, LocalDate startDate, LocalDate endDate) {
+	public Exposition(String title, String description, LocalDate startDate, LocalDate endDate, String imageUrl) {
 		this.title = title;
 		Description = description;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.imageUrl = imageUrl;
 		this.exposedArtefacts = new ArrayList<>();
 	}
 
@@ -69,23 +71,21 @@ public class Exposition {
 			visitorCount += numberOfVisitors;
 	}
 
-	/** Add museum objects to the exposition. If no objects are sent in parameter, the method does nothing.
-	 *
-	 * @param items is the museum objects to be added in the exposition.
+	/** Add a museum object to the exposition.
+	 * Calls the {@link Artefact#displayArtefactInExposition(Exposition)} on the artefact.
+	 * @param artefact is the museum object to be added in the exposition.
 	 */
-	public void addArtefactsToExposition(Artefact... items){
-		if (items==null)
-			return;
-		for (Artefact item: items ) {
-			item.displayArtefactInExposition(this);
-			exposedArtefacts.add(item);
-		}
+	public void addArtefactToExposition(Artefact artefact){
+		artefact.displayArtefactInExposition(this);
+		exposedArtefacts.add(artefact);
 	}
 
 	/** This method calls the {@link Artefact#getOutOfExpo()} on each museum object of the exposition then removes all
 	 * elements in the {@link #exposedArtefacts} collection in the Exposition instance.
 	 */
 	public void endExposition(){
+		if(exposedArtefacts.isEmpty())
+			return;
 		for ( Artefact item : exposedArtefacts ) {
 			item.getOutOfExpo();
 		}

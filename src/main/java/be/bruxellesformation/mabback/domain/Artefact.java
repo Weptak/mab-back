@@ -39,10 +39,10 @@ public class Artefact {
 	private LocalDate dateOfEntry;
 	private int startYear;
 	private int endYear;
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JsonIgnoreProperties("artefacts")
 	private Culture culture;
-	@ManyToOne
+	@ManyToOne (cascade = CascadeType.ALL)
 	@JsonIgnore
 	private Exposition exposition;
 
@@ -118,6 +118,8 @@ public class Artefact {
 	 */
 	public void displayArtefactInExposition(Exposition exposition) {
 		checkOnExpo();
+		if (isOnPermanentDisplay())
+			onPermanentDisplay=false;
 		this.inExposition =true;
 		this.localisation=exposition.getTitle();
 		this.exposition=exposition;
