@@ -56,12 +56,12 @@ public class ArtefactRestController {
      * @return a List of Artefact containing all the results of the search
      */
     @GetMapping("/dates")
-    public List<Artefact> artefactsBetweenDates(@RequestParam String startDate, @RequestParam String endDate){
+    public List<Artefact> artefactsBetweenDates(@RequestParam int startDate, @RequestParam int endDate){
         int startEarlyLimit, endEarlyLimit;
-        startEarlyLimit = endEarlyLimit = Integer.parseInt(startDate);
+        startEarlyLimit = endEarlyLimit = startDate;
 
         int startLateLimit, endLateLimit ;
-        startLateLimit = endLateLimit= Integer.parseInt(endDate);
+        startLateLimit = endLateLimit= endDate;
 
         return repository.findAllByStartYearBetweenOrEndYearBetween(
                 startEarlyLimit,startLateLimit,endEarlyLimit,endLateLimit);
@@ -108,9 +108,9 @@ public class ArtefactRestController {
     public ResponseEntity<Artefact> update(@RequestBody Artefact artefact){
         try {
             repository.save(artefact);
-            return new ResponseEntity<>(artefact,HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(artefact,HttpStatus.OK);
         } catch (Exception exception){
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -125,9 +125,9 @@ public class ArtefactRestController {
         Optional<Artefact> artefact = repository.findById(id);
         if (artefact.isPresent()) {
             repository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -138,9 +138,10 @@ public class ArtefactRestController {
      *             If the value is "reserves", the artefact will be moved to the reserves by calling the
      *             {@link Artefact#sendArtefactToReserves(String)} method.
      *             If the value is "off expo", the artefact will be moved out of the exposition by calling the
-     *             {@link Artefact#getOutOfExpo()} method.
+     *             {@link Artefact#sendOutOfExpo()} method.
      * @return A ResponseEntity with the updated Artefact and an OK status. A NOT_FOUND status will be returned if
-     * the ID is not found in the database.
+     * the ID is not found in the database. An INTERNAL_SERVER_ERROR is returned if the room value is "off expo" and
+     * the Artefact was not in an exposition.
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Artefact> changeLocation(@PathVariable String id,
@@ -157,10 +158,13 @@ public class ArtefactRestController {
         // Change the location depending on the parameters of the request
         switch (room){
             case "reserves" :
-                artefact.checkNotOnExpo();
                 artefact.sendArtefactToReserves("In Reserves");
                 break;
-            case "off expo" : artefact.getOutOfExpo(); break;
+            case "off expo" :
+                if(!artefact.sendOutOfExpo()){
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                break;
             default: artefact.changeLocalisation(room);
         }
 

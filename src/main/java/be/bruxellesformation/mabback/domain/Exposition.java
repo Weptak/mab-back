@@ -1,5 +1,6 @@
 package be.bruxellesformation.mabback.domain;
 
+import be.bruxellesformation.mabback.exceptions.ExpositionException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -50,7 +51,7 @@ public class Exposition {
 	 */
 	public Exposition(String title, String description, LocalDate startDate, LocalDate endDate, String imageUrl) {
 		this.title = title;
-		Description = description;
+		this.Description = description;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.imageUrl = imageUrl;
@@ -58,7 +59,7 @@ public class Exposition {
 	}
 
    /* -------------
-	* Business Methods
+	* Methods
 	* -------------
 	*/
 
@@ -67,8 +68,9 @@ public class Exposition {
 	 * @param numberOfVisitors is the amount of visitors to add. It has to be above 0.
 	 */
 	public void addVisitors(int numberOfVisitors) {
-		if(numberOfVisitors>0)
+		if(numberOfVisitors>0) {
 			visitorCount += numberOfVisitors;
+		}
 	}
 
 	/** Add a museum object to the exposition.
@@ -80,14 +82,23 @@ public class Exposition {
 		exposedArtefacts.add(artefact);
 	}
 
-	/** This method calls the {@link Artefact#getOutOfExpo()} on each museum object of the exposition then removes all
+	/** This method calls the {@link Artefact#sendOutOfExpo()} on each museum object of the exposition then removes all
 	 * elements in the {@link #exposedArtefacts} collection in the Exposition instance.
+	 * @throws ExpositionException with the identification of each Artefact that was not in an exposition in the message.
 	 */
 	public void endExposition(){
-		if(exposedArtefacts.isEmpty())
+		if(exposedArtefacts.isEmpty()) {
 			return;
+		}
+		List<String> problems = new ArrayList<>();
 		for ( Artefact item : exposedArtefacts ) {
-			item.getOutOfExpo();
+			boolean check = item.sendOutOfExpo();
+			if(!check){
+				problems.add(item.getIdentification());
+			}
+		}
+		if(!problems.isEmpty()){
+			throw new ExpositionException("Ces artefacts n'étaient pas dans une exposition : " + problems.toString());
 		}
 		exposedArtefacts.clear();
 	}

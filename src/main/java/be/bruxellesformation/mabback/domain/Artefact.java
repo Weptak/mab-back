@@ -1,7 +1,6 @@
 package be.bruxellesformation.mabback.domain;
 
-import be.bruxellesformation.mabback.exceptions.IsExposedException;
-import be.bruxellesformation.mabback.exceptions.NotInExpositionException;
+import be.bruxellesformation.mabback.exceptions.ExpositionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.time.LocalDate;
  * File Name : Artefact.java
  * Date : 23-11-20
  * @author : Yorick Weenen
- * The identification is the inventory identifier of the artefact
+ * The identification field is the inventory identifier of the museum for the artefact.
  */
 @Entity
 @Getter
@@ -86,8 +85,8 @@ public class Artefact {
 	}
 
 	/* ----------------
-	 *  Business Methods
-	 *  ----------------
+	 *  Methods
+	 *  ---------------
 	 */
 
 	/** Change the state of the museum object to be one in permanent display.
@@ -100,7 +99,6 @@ public class Artefact {
 		this.localisation = roomId;
 		onPermanentDisplay =true;
 	}
-
 
 	/** Change the state of the museum object from one on permanent display to the reserves.
 	 * @param reserveLocation the location in reserve to store the object
@@ -118,8 +116,9 @@ public class Artefact {
 	 */
 	public void displayArtefactInExposition(Exposition exposition) {
 		checkNotOnExpo();
-		if (isOnPermanentDisplay())
-			onPermanentDisplay=false;
+		if (isOnPermanentDisplay()) {
+			onPermanentDisplay = false;
+		}
 		this.inExposition =true;
 		this.localisation=exposition.getTitle();
 		this.exposition=exposition;
@@ -127,25 +126,34 @@ public class Artefact {
 
 	/** The object is to be sent back to the museum's reserves.
 	 *  The method checks if the object is currently in an exposition.
-	 * @throws NotInExpositionException if the museum object is not in an exposition.
+	 * @return The method returns a boolean. FALSE if the object is not currently in an exposition, TRUE if it was taken out of
+	 * its exposition.
 	 */
-	public void getOutOfExpo(){
+	public boolean sendOutOfExpo(){
 		if (inExposition) {
 			inExposition = false;
 			this.localisation = "In reserves";
 			this.exposition=null;
-		} else
-			throw new NotInExpositionException("L'objet "+ this.identification +" n'est pas dans une exposition");
+			return true;
+		} else{
+			return false;
+		}
+
 	}
 
-	/** Check if the museum object is not in an exposition.
-	 * @throws IsExposedException is thrown if the object is in an exposition.
+	/** Checks that the museum object is not in an exposition.
+	 * @throws ExpositionException is thrown if the object is in an exposition.
 	 */
 	public void checkNotOnExpo() {
-		if (inExposition)
-			throw new IsExposedException("L'objet "+ this.identification+" est actuellement en exposition");
+		if (inExposition) {
+			throw new ExpositionException("L'objet " + this.identification + " est actuellement en exposition");
+		}
 	}
 
+	/**
+	 * Changes the location of an artefact to a new room in the museum.
+	 * @param room the destination room.
+	 */
 	public void changeLocalisation(String room){
 		// In a real case, would check the validity of the room.
 		this.localisation = room;

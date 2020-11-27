@@ -41,7 +41,7 @@ public class CultureRestController {
     public ResponseEntity<Culture> findById(@PathVariable("id") String id){
         Optional<Culture> culture = culturesRepository.findById(Long.parseLong(id));
         return culture.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -51,12 +51,12 @@ public class CultureRestController {
      * @return a List of Culture containing all the results of the search
      */
     @GetMapping("/dates")
-    public List<Culture> culturesBetweenDates(@RequestParam String startDate, @RequestParam String endDate){
+    public List<Culture> culturesBetweenDates(@RequestParam int startDate, @RequestParam int endDate){
         int startEarlyLimit, endEarlyLimit;
-        startEarlyLimit = endEarlyLimit = Integer.parseInt(startDate);
+        startEarlyLimit = endEarlyLimit = startDate;
 
         int startLateLimit, endLateLimit ;
-        startLateLimit = endLateLimit= Integer.parseInt(endDate);
+        startLateLimit = endLateLimit= endDate;
 
         return culturesRepository.findAllByStartYearBetweenOrEndYearBetween(
                 startEarlyLimit,startLateLimit,endEarlyLimit,endLateLimit);
@@ -99,7 +99,7 @@ public class CultureRestController {
             culturesRepository.save(culture);
             return new ResponseEntity<>(culture,HttpStatus.ACCEPTED);
         } catch (Exception exception){
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

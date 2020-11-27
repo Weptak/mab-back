@@ -1,7 +1,6 @@
 package be.bruxellesformation.mabback.domain;
 
-import be.bruxellesformation.mabback.exceptions.IsExposedException;
-import be.bruxellesformation.mabback.exceptions.NotInExpositionException;
+import be.bruxellesformation.mabback.exceptions.ExpositionException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -47,7 +46,7 @@ class ArtefactTest {
         assertEquals(expected, testArtefact.getLocalisation());
         assertEquals(testExposition, testArtefact.getExposition());
 
-        testArtefact.getOutOfExpo();
+        assertTrue(testArtefact.sendOutOfExpo());
         assertFalse(testArtefact.isInExposition());
         assertNull(testArtefact.getExposition());
         expected = "In reserves";
@@ -57,11 +56,10 @@ class ArtefactTest {
     @Test
     void shouldGetExceptions(){
         testArtefact.displayArtefactInExposition(testExposition);
-        assertThrows(IsExposedException.class, () -> testArtefact.displayArtefactInRoom("Room 27"));
-        assertThrows(IsExposedException.class, () -> testArtefact.displayArtefactInExposition(testExposition));
+        assertThrows(ExpositionException.class, () -> testArtefact.displayArtefactInRoom("Room 27"));
+        assertThrows(ExpositionException.class, () -> testArtefact.displayArtefactInExposition(testExposition));
 
-        testArtefact.getOutOfExpo();
-        assertThrows(NotInExpositionException.class, ()-> testArtefact.getOutOfExpo());
+        assertTrue(testArtefact.sendOutOfExpo());
 
     }
 }
