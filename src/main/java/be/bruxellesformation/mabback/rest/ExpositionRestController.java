@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/expo")
 public class ExpositionRestController {
@@ -35,13 +36,13 @@ public class ExpositionRestController {
 
     /**
      * Responds to a GET request on "/expo" by returning all the current Expositions, ordered by number of visitors.
-     * @param pagingInfo a Map with the keys pageNumber and itemsPerPage, and numbers as values must be included in
-     *                   the request body.
+     * @param pageNumber the page number of the result set
+     * @param itemsPerPage the number of result per page
      * @return a Page of Exposition.
      */
     @GetMapping
-    public Page<Exposition> allActiveExpositions(@RequestBody Map<String, Integer> pagingInfo){
-        Pageable pagination = PageRequest.of(pagingInfo.get("pageNumber"), pagingInfo.get("itemsPerPage"),
+    public Page<Exposition> allActiveExpositions(@RequestParam String pageNumber, @RequestParam String itemsPerPage){
+        Pageable pagination = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(itemsPerPage),
                 Sort.by(Sort.Direction.DESC, "visitorCount"));
         LocalDate now = LocalDate.now();
         return expositionsRepository.findAllByEndDateAfter(pagination, now);
@@ -50,13 +51,13 @@ public class ExpositionRestController {
     /**
      * Responds to a GET request on "/expo/old" by returning all the ended expositions, ordered from the most recent to
      * the oldest one.
-     * @param pagingInfo  a Map with the keys pageNumber and itemsPerPage, and numbers as values must be included in
-     *                    the body of the request.
+     * @param pageNumber the page number of the result set
+     * @param itemsPerPage the number of result per page
      * @return a Page of Exposition.
      */
     @GetMapping("/old")
-    public Page<Exposition> oldExpositions(@RequestBody Map<String, Integer> pagingInfo) {
-        Pageable pagination = PageRequest.of(pagingInfo.get("pageNumber"), pagingInfo.get("itemsPerPage"));
+    public Page<Exposition> oldExpositions(@RequestParam String pageNumber, @RequestParam String itemsPerPage) {
+        Pageable pagination = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(itemsPerPage));
         LocalDate now = LocalDate.now();
         return expositionsRepository.findAllByEndDateBeforeOrderByStartDateDesc(pagination, now);
     }

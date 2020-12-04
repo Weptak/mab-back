@@ -1,24 +1,34 @@
 package be.bruxellesformation.mabback.rest;
 
+import be.bruxellesformation.mabback.domain.Artefact;
 import be.bruxellesformation.mabback.domain.Culture;
+import be.bruxellesformation.mabback.repositories.IArtefactsRepository;
 import be.bruxellesformation.mabback.repositories.ICulturesRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/culture")
 public class CultureRestController {
 
     //Linked Repositories
     private ICulturesRepository culturesRepository;
+    private IArtefactsRepository artefactsRepository;
 
     // Constructor
-    public CultureRestController(ICulturesRepository culturesRepository) {
+    public CultureRestController(ICulturesRepository culturesRepository, IArtefactsRepository artefactsRepository) {
         this.culturesRepository = culturesRepository;
+        this.artefactsRepository = artefactsRepository;
     }
 
     // Rest Endpoints
@@ -29,7 +39,7 @@ public class CultureRestController {
      */
     @GetMapping
     public List<Culture> allCultures(){
-        return culturesRepository.findAll();
+        return culturesRepository.findAllByOrderByStartYear();
     }
 
     /**
@@ -42,6 +52,20 @@ public class CultureRestController {
         Optional<Culture> culture = culturesRepository.findById(Long.parseLong(id));
         return culture.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * Responds to a GET request on "culture/{id}/artefacts" to retrieve all the artefacts from a culture.
+     * @param id the id of the culture
+     * @param pageNumber the page number of the result set
+     * @param itemsPerPage the number of result per page
+     * @return a Page of the artefacts related to the culture
+     */
+    @GetMapping(path = "/{id}/artefacts")
+    public Page<Artefact> artefactsFromCulture(@PathVariable("id") String id ,@RequestParam String pageNumber, @RequestParam String itemsPerPage){
+        Pageable pagination = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(itemsPerPage));
+        Culture culture = culturesRepository.findById(Long.parseLong(id)).orElseThrow(NoSuchElementException::new);
+        return artefactsRepository.findAllByCulture(culture,pagination);
     }
 
     /**

@@ -32,7 +32,7 @@ public class Culture {
 	private int startYear;
 	private int endYear;
 	@OneToMany(mappedBy = "culture", cascade = CascadeType.ALL)
-	@JsonIgnoreProperties("culture")
+	@JsonIgnore
 	private List<Artefact> artefacts;
 
 	/*

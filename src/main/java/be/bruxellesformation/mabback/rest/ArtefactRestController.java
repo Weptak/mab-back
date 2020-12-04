@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/collections")
 public class ArtefactRestController {
@@ -28,12 +29,15 @@ public class ArtefactRestController {
     // Rest Endpoints
 
     /**
-     * Responds to a GET request on "/collections". The body must contain a Map with the keys: pageNumber and itemsPerPage. The values should be numbers.
+     * Responds to a GET request on "/collections".
+     * The body must contain a Map with the keys: pageNumber and itemsPerPage. The values should be numbers.
+     * @param pageNumber the page number of the result set
+     * @param itemsPerPage the number of result per page
      * @return a Page of all the Artefacts
      */
     @GetMapping
-    public Page<Artefact> allArtefacts(@RequestBody Map<String, Integer> pagingInfo){
-        Pageable pagination = PageRequest.of(pagingInfo.get("pageNumber"), pagingInfo.get("itemsPerPage"));
+    public Page<Artefact> allArtefacts(@RequestParam String pageNumber, @RequestParam String itemsPerPage){
+        Pageable pagination = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(itemsPerPage));
         return repository.findAll(pagination);
     }
 
