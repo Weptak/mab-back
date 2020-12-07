@@ -11,6 +11,7 @@ This is the project carried out as part of my Java Developer training at Busines
 It is a website developed in Angular for a fictitious museum, with management of collections and exhibitions saved in a MySQL database. The link between front and back is made by means of Rest endpoints. The project also manages security with three levels of access: visitor, researcher and curator.
 
 =============================================
+
 Le Git de la partie front de ce projet se trouve ici :
 The front-end Git is located here :
 https://github.com/Weptak/mab-front
