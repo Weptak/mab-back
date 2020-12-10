@@ -148,7 +148,7 @@ public class ExpositionRestController {
 
         Optional<Exposition> searchedExpo = expositionsRepository.findById(Long.parseLong(id));
 
-        if (!searchedExpo.isPresent())
+        if (!searchedExpo.isPresent() || number < 1)
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
         Exposition exposition = searchedExpo.get();
