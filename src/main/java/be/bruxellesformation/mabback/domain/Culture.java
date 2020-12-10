@@ -31,7 +31,7 @@ public class Culture {
 	private String cultureMap;
 	private int startYear;
 	private int endYear;
-	@OneToMany(mappedBy = "culture", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "culture", cascade = CascadeType.PERSIST)
 	@JsonIgnore
 	private List<Artefact> artefacts;
 

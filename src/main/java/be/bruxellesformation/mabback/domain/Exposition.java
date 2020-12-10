@@ -33,7 +33,7 @@ public class Exposition {
 	private String imageUrl;
 	private int visitorCount = 0;
 
-	@OneToMany(mappedBy = "exposition", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "exposition", cascade = CascadeType.PERSIST)
 	private List<Artefact> exposedArtefacts;
 
 	/*

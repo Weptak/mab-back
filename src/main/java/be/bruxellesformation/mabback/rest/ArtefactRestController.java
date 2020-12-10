@@ -2,6 +2,7 @@ package be.bruxellesformation.mabback.rest;
 
 import be.bruxellesformation.mabback.domain.Artefact;
 import be.bruxellesformation.mabback.repositories.IArtefactsRepository;
+import be.bruxellesformation.mabback.repositories.ICulturesRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin
@@ -19,11 +19,13 @@ import java.util.Optional;
 public class ArtefactRestController {
 
     // Linked Repository
-    private IArtefactsRepository repository;
+    private IArtefactsRepository artefactsRepository;
+    private ICulturesRepository culturesRepository;
 
     // Constructor
-    public ArtefactRestController(IArtefactsRepository repository) {
-        this.repository = repository;
+    public ArtefactRestController(IArtefactsRepository artefactsRepository, ICulturesRepository culturesRepository) {
+        this.artefactsRepository = artefactsRepository;
+        this.culturesRepository=culturesRepository;
     }
 
     // Rest Endpoints
@@ -38,7 +40,7 @@ public class ArtefactRestController {
     @GetMapping
     public Page<Artefact> allArtefacts(@RequestParam String pageNumber, @RequestParam String itemsPerPage){
         Pageable pagination = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(itemsPerPage));
-        return repository.findAll(pagination);
+        return artefactsRepository.findAll(pagination);
     }
 
     /**
@@ -48,7 +50,7 @@ public class ArtefactRestController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Artefact> findById(@PathVariable String id){
-        Optional<Artefact> artefact = repository.findById(id);
+        Optional<Artefact> artefact = artefactsRepository.findById(id);
         return artefact.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
@@ -67,7 +69,7 @@ public class ArtefactRestController {
         int startLateLimit, endLateLimit ;
         startLateLimit = endLateLimit= endDate;
 
-        return repository.findAllByStartYearBetweenOrEndYearBetween(
+        return artefactsRepository.findAllByStartYearBetweenOrEndYearBetween(
                 startEarlyLimit,startLateLimit,endEarlyLimit,endLateLimit);
     }
 
@@ -81,7 +83,7 @@ public class ArtefactRestController {
     public List<Artefact> complexSearch(@RequestParam String criteria){
         String name, culturalPhase, type, material;
         name = culturalPhase = type = material = criteria;
-        return repository.
+        return artefactsRepository.
                 findAllByNameContainingIgnoreCaseOrCulturalPhaseContainingIgnoreCaseOrTypeContainingIgnoreCaseOrMaterialContainingIgnoreCase(
                         name, culturalPhase, type, material);
     }
@@ -95,8 +97,8 @@ public class ArtefactRestController {
 
     @PostMapping
     public ResponseEntity<Artefact> create(@RequestBody Artefact artefact){
-        if (!repository.existsById(artefact.getIdentification())) {
-            repository.save(artefact);
+        if (!artefactsRepository.existsById(artefact.getIdentification())) {
+            artefactsRepository.save(artefact);
             return new ResponseEntity<>(artefact, HttpStatus.CREATED);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -111,7 +113,7 @@ public class ArtefactRestController {
     @PutMapping
     public ResponseEntity<Artefact> update(@RequestBody Artefact artefact){
         try {
-            repository.save(artefact);
+            artefactsRepository.save(artefact);
             return new ResponseEntity<>(artefact,HttpStatus.OK);
         } catch (Exception exception){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,9 +128,9 @@ public class ArtefactRestController {
      */
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Artefact> deleteById(@PathVariable String id){
-        Optional<Artefact> artefact = repository.findById(id);
+        Optional<Artefact> artefact = artefactsRepository.findById(id);
         if (artefact.isPresent()) {
-            repository.deleteById(id);
+            artefactsRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -149,11 +151,11 @@ public class ArtefactRestController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Artefact> changeLocation(@PathVariable String id,
-                                                   @RequestParam(required = false) String room){
+                                                   @RequestParam String room){
 
         // Retrieve the Artefact
         Artefact artefact;
-        Optional<Artefact> searchedArtefact = repository.findById(id);
+        Optional<Artefact> searchedArtefact = artefactsRepository.findById(id);
         if(!searchedArtefact.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
@@ -169,10 +171,12 @@ public class ArtefactRestController {
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 break;
-            default: artefact.changeLocalisation(room);
+            default: {
+                artefact.changeLocalisation(room);
+            }
         }
 
-        repository.save(artefact);
+        artefactsRepository.save(artefact);
         return new ResponseEntity<>(artefact,HttpStatus.OK);
     }
 }

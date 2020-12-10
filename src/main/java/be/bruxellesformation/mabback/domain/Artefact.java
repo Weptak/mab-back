@@ -38,10 +38,10 @@ public class Artefact {
 	private LocalDate dateOfEntry;
 	private int startYear;
 	private int endYear;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JsonIgnoreProperties("artefacts")
 	private Culture culture;
-	@ManyToOne (cascade = CascadeType.ALL)
+	@ManyToOne (cascade = CascadeType.PERSIST)
 	@JsonIgnore
 	private Exposition exposition;
 
@@ -57,7 +57,6 @@ public class Artefact {
 	 * @param objectDescription describes the object
 	 * @param type is the type of object, like "statue" or "amphora"
 	 * @param material is the primary material used to make the object
-	 * @param culture is the culture associated with the object
 	 * @param culturalPhase is the cultural phase associated with the object.
 	 * @param periodDescription is the literary value of the date of the object, like "second half of 2nd century AD"
 	 * @param startYear the starting date of this object or object type date in Year, like "150"
@@ -66,8 +65,7 @@ public class Artefact {
 	 * @param localisation the physical location of the object, can be a room identifier, an exposition name or a location in the reserves
 	 * @param imageURL the link to the picture of the object
 	 */
-	public Artefact(String identification, String name, String objectDescription, String type, String material,
-					Culture culture, String culturalPhase, String periodDescription, int startYear, int endYear,
+	public Artefact(String identification, String name, String objectDescription, String type, String material, Culture culture, String culturalPhase, String periodDescription, int startYear, int endYear,
 					LocalDate dateOfEntry, String localisation, String imageURL) {
 		this.identification = identification;
 		this.name = name;
@@ -80,8 +78,8 @@ public class Artefact {
 		this.dateOfEntry = dateOfEntry;
 		this.startYear = startYear;
 		this.endYear = endYear;
-		this.culture = culture;
 		this.objectDescription = objectDescription;
+		this.culture=culture;
 	}
 
 	/* ----------------
@@ -156,7 +154,9 @@ public class Artefact {
 	 */
 	public void changeLocalisation(String room){
 		// In a real case, would check the validity of the room.
+		this.onPermanentDisplay=true;
 		this.localisation = room;
+
 	}
 
 }
