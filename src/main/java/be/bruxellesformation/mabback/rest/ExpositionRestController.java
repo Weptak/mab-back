@@ -10,8 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -92,6 +94,7 @@ public class ExpositionRestController {
      * was already in the database a NOT_ACCEPTABLE status is returned.
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('CONSERVATEUR')")
     public ResponseEntity<Exposition> create(@RequestBody Exposition exposition){
         if (!expositionsRepository.existsById(exposition.getId())) {
             expositionsRepository.save(exposition);
@@ -107,6 +110,7 @@ public class ExpositionRestController {
      * unsuccessful, it will return a NOT_ACCEPTABLE status.
      */
     @PutMapping
+    @PreAuthorize("hasAuthority('CONSERVATEUR')")
     public ResponseEntity<Exposition> update(@RequestBody Exposition exposition){
         try {
             expositionsRepository.save(exposition);
@@ -124,6 +128,7 @@ public class ExpositionRestController {
      * it returns a NOT_ACCEPTED status.
      */
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('CONSERVATEUR')")
     public ResponseEntity<Exposition> deleteById(@PathVariable String id){
         Long idLong = Long.parseLong(id);
         Optional<Exposition> exposition = expositionsRepository.findById(idLong);
@@ -166,6 +171,7 @@ public class ExpositionRestController {
      * or if the Array is empty, a NOT_ACCEPTABLE status is returned.
      */
     @PatchMapping("/{id}/addArtefacts")
+    @PreAuthorize("hasAuthority('CONSERVATEUR')")
     public ResponseEntity<Exposition> addArtefacts(@PathVariable String id, @RequestBody String[] items){
 
         // Searching and check
@@ -193,6 +199,7 @@ public class ExpositionRestController {
      * @return A ResponseEntity with the Exposition and OK status, or a NOT_FOUND status if the id is not found.
      */
     @PatchMapping("/{id}/endexpo")
+    @PreAuthorize("hasAuthority('CONSERVATEUR')")
     public ResponseEntity<Exposition> endingExposition(@PathVariable String id){
         Exposition exposition = expositionsRepository.findById(Long.parseLong(id)).orElse(null);
         if(exposition == null)

@@ -9,8 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -102,6 +104,7 @@ public class CultureRestController {
      * was already in the database a NOT_ACCEPTABLE status is returned.
      */
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Culture> create(@RequestBody Culture culture){
         if (!culturesRepository.existsById(culture.getId())) {
             culturesRepository.save(culture);
@@ -117,6 +120,7 @@ public class CultureRestController {
      * unsuccessful, it will return a NOT_ACCEPTABLE status.
      */
     @PutMapping
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Culture> update(@RequestBody Culture culture){
         try {
             culturesRepository.save(culture);
@@ -133,6 +137,7 @@ public class CultureRestController {
      * it returns a NOT_ACCEPTED status.
      */
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Culture> deleteById(@PathVariable String id){
         Long idLong = Long.parseLong(id);
         Optional<Culture> culture = culturesRepository.findById(idLong);

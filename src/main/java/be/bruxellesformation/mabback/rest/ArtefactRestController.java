@@ -8,8 +8,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,6 +98,7 @@ public class ArtefactRestController {
      */
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Artefact> create(@RequestBody Artefact artefact){
         if (!artefactsRepository.existsById(artefact.getIdentification())) {
             artefactsRepository.save(artefact);
@@ -111,6 +114,7 @@ public class ArtefactRestController {
      * unsuccessful, it will return a NOT_ACCEPTABLE status.
      */
     @PutMapping
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Artefact> update(@RequestBody Artefact artefact){
         try {
             artefactsRepository.save(artefact);
@@ -127,6 +131,7 @@ public class ArtefactRestController {
      * it returns a NOT_ACCEPTED status.
      */
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Artefact> deleteById(@PathVariable String id){
         Optional<Artefact> artefact = artefactsRepository.findById(id);
         if (artefact.isPresent()) {
@@ -150,6 +155,7 @@ public class ArtefactRestController {
      * the Artefact was not in an exposition.
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CONSERVATEUR', 'CHERCHEUR')")
     public ResponseEntity<Artefact> changeLocation(@PathVariable String id,
                                                    @RequestParam String room){
 
